@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EduCentre • Dashboard</title>
+
+  <!-- Libraries -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- External CSS -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* GLOBAL FONT */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    /* LIGHT MODE: background baru */
+    html[data-bs-theme="light"] body {
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(129, 230, 217, 0.35), transparent 55%),
+        radial-gradient(circle at 100% 0%, rgba(129, 140, 248, 0.32), transparent 55%),
+        radial-gradient(circle at 0% 100%, rgba(251, 191, 36, 0.25), transparent 55%),
+        linear-gradient(135deg, #f9fafb, #e5f0ff);
+      background-attachment: fixed;
+      color: #0f172a;
+    }
+
+    /* DARK MODE – kekal seperti asal */
+    html[data-bs-theme="dark"] body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, #2b5876, #4e4376);
+      background-attachment: fixed;
+      color: #e5e7eb;
+    }
+
+    /* NAVBAR */
+    .edu-navbar {
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    }
+
+    /* Navbar dark + light */
+    html[data-bs-theme="dark"] .edu-navbar {
+      background: rgba(15, 23, 42, 0.92);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.8);
+    }
+
+    html[data-bs-theme="light"] .edu-navbar {
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.10);
+    }
+
+    .navbar-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .navbar-brand {
+      letter-spacing: 0.03em;
+      font-size: 1.05rem;
+    }
+
+    .navbar-nav .nav-link {
+      font-size: 0.95rem;
+      padding-inline: 0.75rem;
+      border-radius: 999px;
+      transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      background-color: rgba(148, 163, 184, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .navbar-nav .nav-link.active {
+      background: linear-gradient(135deg, #2563eb, #22c55e);
+      color: #f9fafb !important;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.45);
+    }
+
+    html[data-bs-theme="light"] .navbar-nav .nav-link {
+      color: #0f172a;
+    }
+
+    /* Dark mode button */
+    #darkToggle {
+      border: none;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.35);
+    }
+
+    /* PAGE CONTAINER */
+    .dashboard-wrapper {
+      padding-block: 1.75rem 2.5rem;
+      color: inherit;
+    }
+
+    .dashboard-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .dashboard-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .dashboard-subtitle {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    html[data-bs-theme="light"] .dashboard-subtitle {
+      color: #6b7280;
+    }
+
+    html[data-bs-theme="dark"] .dashboard-subtitle {
+      color: #cbd5f5;
+    }
+
+    /* GLASS CARDS – LIGHT & DARK */
+    html[data-bs-theme="light"] .glass-card,
+    html[data-bs-theme="light"] .glass-card-soft {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 1.1rem;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: #0f172a;
+    }
+
+    html[data-bs-theme="dark"] .glass-card {
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.94));
+      border-radius: 1.1rem;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      color: #e5e7eb;
+    }
+
+    html[data-bs-theme="dark"] .glass-card-soft {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 64, 175, 0.85));
+      border-radius: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: #e5e7eb;
+    }
+
+    /* QUICK ACTIONS */
+    .quick-card {
+      cursor: pointer;
+      border-radius: 0.95rem;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.2s ease, background 0.25s ease;
+    }
+
+    html[data-bs-theme="light"] .quick-card {
+      background: linear-gradient(145deg, #ffffff, #eef4ff);
+      color: #0f172a;
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.10);
+    }
+
+    html[data-bs-theme="dark"] .quick-card {
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.92));
+      color: #e5e7eb;
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.7);
+    }
+
+    .quick-card i {
+      filter: drop-shadow(0 8px 18px rgba(15, 23, 42, 0.25));
+    }
+
+    .quick-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(96, 165, 250, 0.8);
+    }
+
+    html[data-bs-theme="light"] .quick-card:hover {
+      background: linear-gradient(145deg, #e0ecff, #ffffff);
+      box-shadow: 0 22px 54px rgba(15, 23, 42, 0.18);
+    }
+
+    html[data-bs-theme="dark"] .quick-card:hover {
+      background: radial-gradient(circle at top, rgba(30, 64, 175, 0.95), rgba(15, 23, 42, 0.96));
+    }
+
+    .quick-card p {
+      font-size: 0.9rem;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    /* CHARTS SECTION */
+    .card h6.fw-bold {
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    html[data-bs-theme="light"] .card h6.fw-bold {
+      color: #111827;
+    }
+
+    html[data-bs-theme="dark"] .card h6.fw-bold {
+      color: #e5e7eb;
+    }
+
+    .chart-card {
+      padding: 1rem 1.25rem 1.1rem;
+    }
+
+    /* ACTIVITY LOG */
+    #activityList {
+      border-radius: 0.85rem;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+    }
+
+    html[data-bs-theme="light"] #activityList {
+      background: rgba(255, 255, 255, 0.96);
+      color: #111827;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
+    }
+
+    html[data-bs-theme="dark"] #activityList {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.65);
+    }
+
+    #activityList p.text-muted {
+      color: #9ca3af !important;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    html[data-bs-theme="light"] .section-title {
+      color: #0f172a;
+    }
+
+    html[data-bs-theme="dark"] .section-title {
+      color: #e5e7eb;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 767.98px) {
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .dashboard-title {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-dark edu-navbar shadow-sm py-2">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center fw-semibold" href="dashboard.html">
+        <img src="image/smart.png" class="navbar-logo me-2" alt="EduCentre Logo">
+        EduCentre Admin
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#eduNavbar">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="eduNavbar">
+        <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+          <li class="nav-item">
+            <a class="nav-link active" href="dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="courses.html"><i class="bi bi-book me-1"></i>Courses</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="student.html"><i class="bi bi-people me-1"></i>Students</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="attendance.html"><i class="bi bi-calendar-check me-1"></i>Attendance</a>
+          </li>
+
+          <!-- Dark Mode -->
+          <li class="nav-item mt-2 mt-lg-0">
+            <button id="darkToggle" class="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center">
+              <i id="darkIcon" class="bi bi-moon"></i>
+            </button>
+          </li>
+
+          <!-- Profile Menu -->
+          <li class="nav-item dropdown mt-2 mt-lg-0">
+            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle me-1"></i> Admin
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow">
+              <li><a class="dropdown-item" href="profile.html"><i class="bi bi-person me-1"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="setting.html"><i class="bi bi-gear me-1"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item text-danger" href="index.html">
+                  <i class="bi bi-box-arrow-right me-1"></i>Logout
+                </a>
+              </li>
+            </ul>
+          </li>
+
+        </ul>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="container dashboard-wrapper">
+    <!-- Header / intro -->
+    <div class="dashboard-header">
+      <div>
+        <div class="dashboard-title">Dashboard Overview</div>
+        <div class="dashboard-subtitle">Monitor enrolments, performance, and recent activities in one place.</div>
+      </div>
+    </div>
+
+    <!-- Quick actions -->
+    <div class="row g-3">
+      <div class="col-md-3 col-6">
+        <div id="qaAddStudent" class="quick-card p-3 text-center">
+          <i class="bi bi-person-plus fs-1 text-primary mb-1"></i>
+          <p class="fw-semibold mb-0">Add Student</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div id="qaAddCourse" class="quick-card p-3 text-center">
+          <i class="bi bi-journal-plus fs-1 text-success mb-1"></i>
+          <p class="fw-semibold mb-0">Add Course</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div id="qaManageAttendance" class="quick-card p-3 text-center">
+          <i class="bi bi-calendar-check fs-1 text-warning mb-1"></i>
+          <p class="fw-semibold mb-0">Manage Attendance</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div id="qaExportReport" class="quick-card p-3 text-center">
+          <i class="bi bi-cloud-download fs-1 text-info mb-1"></i>
+          <p class="fw-semibold mb-0">Export Report</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="row mt-5 g-4">
+      <div class="col-lg-6">
+        <div class="card glass-card chart-card h-100">
+          <h6 class="fw-bold mb-3">Monthly Enrolments</h6>
+          <canvas id="enrolmentChart" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card glass-card chart-card h-100">
+          <h6 class="fw-bold mb-3">Student Performance</h6>
+          <canvas id="performanceChart" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY LOG -->
+    <section class="mt-5">
+      <h5 class="fw-bold mb-3 section-title">Latest Activities</h5>
+      <div class="card glass-card-soft p-3" id="activityList">
+        <p class="text-muted mb-0">No recent activities.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/scripts.js"></script>
+</body>
+</html>
+
+
